@@ -1,0 +1,25 @@
+# Visual Studio Code
+.vscode/
+
+# IntelliJ IDEA / Android Studio
+.idea/
+*.iml
+
+# Java / Maven / Gradle
+target/
+.gradle/
+build/
+**/build/
+
+# Android local configuration
+local.properties
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Operating systems
+.DS_Store
+Thumbs.db
+
