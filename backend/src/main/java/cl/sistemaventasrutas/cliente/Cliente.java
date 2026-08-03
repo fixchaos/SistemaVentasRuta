@@ -4,7 +4,14 @@ import cl.sistemaventasrutas.ruta.Ruta;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "clientes")
+@Table(
+    name = "clientes",
+    indexes = {
+        @Index(name = "idx_cliente_ruta", columnList = "ruta_id"),
+        @Index(name = "idx_cliente_activo", columnList = "activo")
+    }
+)
+
 public class Cliente {
 
     @Id
@@ -14,10 +21,10 @@ public class Cliente {
     @Column(nullable = false, length = 50)
     private String nombre;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, unique = true,length = 30)
     private String telefono;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, unique = true, length = 255)
     private String direccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,38 +42,43 @@ public class Cliente {
         String telefono,
         String direccion,
         Ruta ruta){
+        this.nombre = nombre;
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.ruta = ruta;
+    }
 
-            this.nombre = nombre;
-            this.telefono = telefono;
-            this.direccion = direccion;
-            this.ruta = ruta;
-        }
-
-        public Long getId(){
-            return id;
-        }
-
-        public String getNombre(){
-            return nombre;
-        }
-
-        public String getTelefono(){
-            return telefono;
-        }
-
-        public String getDireccion(){
-            return direccion;
-        }
-
-        public Ruta getRuta(){
-            return ruta;
-        }
-
-        public boolean isActivo(){
-            return activo;
-        }
-
-        public void desactivar(){
-            this.activo = false;
-        }
+    //MÉTODOS DE NEGOCIO
+    public void desactivar(){
+        this.activo = false;
+    }
+    public void reactivar() {
+        this.activo = true;
+    }
+    public void actualizarDatos(String nombre, String telefono, String direccion, Ruta ruta) {
+        this.nombre = nombre;
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.ruta = ruta;
+    }
+    
+    //GETTERS
+    public Long getId(){
+        return id;
+    }
+    public String getNombre(){
+        return nombre;
+    }
+    public String getTelefono(){
+        return telefono;
+    }
+    public String getDireccion(){
+        return direccion;
+    }
+    public Ruta getRuta(){
+        return ruta;
+    }
+    public boolean isActivo(){
+        return activo;
+    }
 }

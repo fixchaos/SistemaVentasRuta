@@ -58,25 +58,25 @@ public class VentaService {
         venta.calcularTotales();
         ventaRepository.save(venta);
 
-        return convertirAResponse(venta);
+        return toResponse(venta);
     }
 
     public List<VentaResponse> listar() {
         // Mejora: Simplificación con Streams
         return ventaRepository.findAll().stream()
-                .map(this::convertirAResponse)
+                .map(this::toResponse)
                 .toList();
     }
 
     public VentaResponse obtenerPorId(Long id) {
-        return convertirAResponse(buscarVenta(id));
+        return toResponse(buscarVenta(id));
     }
 
     // Mejora opcional: Buscar por UUID para el frontend
     public VentaResponse obtenerPorUuid(UUID uuid) {
         Venta venta = ventaRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
-        return convertirAResponse(venta);
+        return toResponse(venta);
     }
 
     @Transactional // Permiso de escritura
@@ -94,7 +94,7 @@ public class VentaService {
         }
 
         venta.anular();
-        return convertirAResponse(venta);
+        return toResponse(venta);
     }
 
     @Transactional
@@ -120,7 +120,7 @@ public class VentaService {
     }
 
     private Producto buscarProducto(Long productoId) {
-        return productoRepository.findById(productoId)
+        return productoRepository.findByIdAndActivoTrue(productoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
     }
 
@@ -135,7 +135,7 @@ public class VentaService {
         }
     }
 
-    private VentaResponse convertirAResponse(Venta venta) {
+    private VentaResponse toResponse(Venta venta) {
         List<DetalleVentaResponse> items = venta.getDetalles()
                 .stream()
                 .map(this::convertirDetalleAResponse)
