@@ -23,9 +23,10 @@ public class ClienteService {
         this.rutaRepository = rutaRepository;
     }
 
+    //Métodos públicos
+
     public ClienteResponse crear(ClienteRequest request) {
-        Ruta ruta = rutaRepository.findByIdAndActivoTrue(request.rutaId()).orElseThrow(() ->
-        new IllegalArgumentException("Ruta no encontrada"));
+        Ruta ruta = buscarRuta(request.rutaId());
         if(clienteRepository.existsByTelefono(request.telefono())){
             throw new IllegalArgumentException("Ya existe un cliente con ese número de teléfono");
         }
@@ -53,15 +54,12 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public ClienteResponse obtenerPorId(Long id){
-        Cliente cliente = clienteRepository.findByIdAndActivoTrue(id)
-        .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+        Cliente cliente = buscarClienteActivo(id);
         return toResponse(cliente);
     }
 
     public ClienteResponse actualizar(Long id, ClienteRequest request){
-        Cliente cliente = clienteRepository.findByIdAndActivoTrue(id)
-            .orElseThrow(()-> new IllegalArgumentException("Cliente no encontrado"));
-
+        Cliente cliente = buscarClienteActivo(id);
         if(clienteRepository.existsByTelefonoAndIdNot(request.telefono(), id)){
             throw new IllegalArgumentException("Ya existe un cliente con ese número de teléfono");
         };
@@ -69,8 +67,7 @@ public class ClienteService {
             throw new IllegalArgumentException("Ya existe un cliente con esa dirección");
         }
 
-        Ruta ruta = rutaRepository.findByIdAndActivoTrue(request.rutaId())
-            .orElseThrow(() -> new IllegalArgumentException("Ruta no encontrada"));
+        Ruta ruta = buscarRuta(request.rutaId());
 
         cliente.actualizarDatos(
             request.nombre(),
@@ -81,18 +78,33 @@ public class ClienteService {
     }
 
     public ClienteResponse reactivar(Long id){
-        Cliente cliente = clienteRepository.findById(id)
-        .orElseThrow(()-> new IllegalArgumentException("Cliente no encontrado"));
+        Cliente cliente = buscarCliente(id);
         cliente.reactivar();
         return toResponse(cliente);
     }
 
     public ClienteResponse eliminar(Long id) {
-        Cliente cliente = clienteRepository
-        .findByIdAndActivoTrue(id)
-        .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+        Cliente cliente = buscarClienteActivo(id);
         cliente.desactivar();
         return toResponse(cliente);
+    }
+
+    //Métodos privados
+
+    private Cliente buscarClienteActivo(Long id){
+        return clienteRepository.findByIdAndActivoTrue(id)
+        .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+    }
+
+    private Cliente buscarCliente(Long id){
+        return clienteRepository.findById(id)
+        .orElseThrow(()->
+        new IllegalArgumentException("Cliente no encontrado"));
+    }
+
+    private Ruta buscarRuta(Long rutaId){
+        return rutaRepository.findByIdAndActivoTrue(rutaId)
+        .orElseThrow(()-> new IllegalArgumentException("Ruta no encontrada"));
     }
 
     private ClienteResponse toResponse(Cliente cliente) {
