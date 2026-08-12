@@ -30,6 +30,7 @@ public class ProductoService {
         Producto producto = new Producto(
                 request.codigo(),
                 request.nombre(),
+                request.unidad(),
                 request.precioCosto(),
                 request.precioVenta(),
                 request.stock());
@@ -67,6 +68,7 @@ public class ProductoService {
                 producto.getId(),
                 producto.getCodigo(),
                 producto.getNombre(),
+                producto.getUnidad(),
                 producto.getPrecioCosto(),
                 producto.getPrecioVenta(),
                 producto.getStock(),

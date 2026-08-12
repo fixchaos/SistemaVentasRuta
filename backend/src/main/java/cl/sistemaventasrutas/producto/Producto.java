@@ -21,6 +21,8 @@ public class Producto {
     @Column(nullable = false, length = 160)
     private String nombre;
 
+    @Column(nullable = false, length = 30)
+    private String unidad;
 
     @Column(nullable = false)
     private Long precioCosto;
@@ -40,12 +42,14 @@ public class Producto {
     public Producto(
             String codigo,
             String nombre,
+            String unidad,
             Long precioCosto,
             Long precioVenta,
             Long stock) {
 
         this.codigo = codigo;
         this.nombre = nombre;
+        this.unidad = unidad;
         this.precioCosto = precioCosto;
         this.precioVenta = precioVenta;
         this.stock = stock;
@@ -63,6 +67,9 @@ public class Producto {
         return nombre;
     }
 
+    public String getUnidad(){
+        return unidad;
+    }
 
     public Long getPrecioCosto() {
         return precioCosto;

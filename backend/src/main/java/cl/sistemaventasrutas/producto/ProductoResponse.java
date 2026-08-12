@@ -5,6 +5,7 @@ public record ProductoResponse(
         Long id,
         String codigo,
         String nombre,
+        String unidad,
         Long precioCosto,
         Long precioVenta,
         Long stock,
