@@ -18,7 +18,7 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 160)
     private String nombre;
 
     @Column(nullable = false, unique = true,length = 30)
@@ -52,7 +52,7 @@ public class Cliente {
     public void desactivar(){
         this.activo = false;
     }
-    public void reactivar() {
+    public void reactivar(){
         this.activo = true;
     }
     public void actualizarDatos(String nombre, String telefono, String direccion, Ruta ruta) {
@@ -61,7 +61,7 @@ public class Cliente {
         this.direccion = direccion;
         this.ruta = ruta;
     }
-    
+
     //GETTERS
     public Long getId(){
         return id;
