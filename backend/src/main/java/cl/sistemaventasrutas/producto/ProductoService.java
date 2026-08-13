@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.sistemaventasrutas.shared.Mensajes;
+import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+
 @Service
 @Transactional
 public class ProductoService {
@@ -55,8 +58,8 @@ public class ProductoService {
         Producto producto = productoRepository
                 .findByIdAndActivoTrue(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Producto no encontrado"));
+                        new ResourceNotFoundException(Mensajes.PRODUCTO_NO_ENCONTRADO
+                                ));
 
         producto.desactivar();
     }

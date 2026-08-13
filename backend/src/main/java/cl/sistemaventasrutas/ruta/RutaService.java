@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.sistemaventasrutas.shared.Mensajes;
+import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+
 @Service
 @Transactional
 public class RutaService {
@@ -44,7 +47,7 @@ public class RutaService {
         Ruta ruta = rutaRepository
                 .findByIdAndActivoTrue(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Ruta no encontrada"));
+                        new ResourceNotFoundException(Mensajes.RUTA_NO_ENCONTRADA));
 
         ruta.desactivar();
     }

@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cl.sistemaventasrutas.ruta.Ruta;
 import cl.sistemaventasrutas.ruta.RutaRepository;
+import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+import cl.sistemaventasrutas.shared.Mensajes;
+
 
 @Service
 @Transactional
@@ -93,18 +96,18 @@ public class ClienteService {
 
     private Cliente buscarClienteActivo(Long id){
         return clienteRepository.findByIdAndActivoTrue(id)
-        .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+        .orElseThrow(() -> new ResourceNotFoundException(Mensajes.CLIENTE_NO_ENCONTRADO));
     }
 
     private Cliente buscarCliente(Long id){
         return clienteRepository.findById(id)
         .orElseThrow(()->
-        new IllegalArgumentException("Cliente no encontrado"));
+        new ResourceNotFoundException(Mensajes.CLIENTE_NO_ENCONTRADO));
     }
 
     private Ruta buscarRuta(Long rutaId){
         return rutaRepository.findByIdAndActivoTrue(rutaId)
-        .orElseThrow(()-> new IllegalArgumentException("Ruta no encontrada"));
+        .orElseThrow(()-> new IllegalArgumentException(Mensajes.RUTA_NO_ENCONTRADA));
     }
 
     private ClienteResponse toResponse(Cliente cliente) {
