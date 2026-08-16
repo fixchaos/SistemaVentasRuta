@@ -40,10 +40,6 @@ public class Ruta {
         return activo;
     }
 
-    public void cambiarNombre(String nombre){
-        this.nombre = nombre;
-    }
-
     public void desactivar(){
         this.activo = false;
     }
