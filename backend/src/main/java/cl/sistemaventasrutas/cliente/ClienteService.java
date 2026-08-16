@@ -86,10 +86,9 @@ public class ClienteService {
         return ClienteResponse.from(cliente);
     }
 
-    public ClienteResponse eliminar(Long id) {
+    public void eliminar(Long id) {
         Cliente cliente = buscarClienteActivo(id);
         cliente.desactivar();
-        return ClienteResponse.from(cliente);
     }
 
     //Métodos privados

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,35 +27,35 @@ public class VentaController {
     }
 
     @PostMapping
-    public ResponseEntity<VentaResponse> crear(@Valid @RequestBody VentaRequest request) {
-        VentaResponse response = ventaService.crear(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @ResponseStatus(HttpStatus.CREATED)
+    public VentaResponse crear(@Valid @RequestBody VentaRequest request){
+        return ventaService.crear(request);
     }
 
     @GetMapping
-    public ResponseEntity<List<VentaResponse>> listar() {
-        return ResponseEntity.ok(ventaService.listar());
+    public List<VentaResponse> listar() {
+        return ventaService.listar();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VentaResponse> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(ventaService.obtenerPorId(id));
+    public VentaResponse obtenerPorId(@PathVariable Long id) {
+        return ventaService.obtenerPorId(id);
     }
 
     // Endpoint opcional para buscar por UUID desde la web
     @GetMapping("/uuid/{uuid}")
-    public ResponseEntity<VentaResponse> obtenerPorUuid(@PathVariable UUID uuid) {
-        return ResponseEntity.ok(ventaService.obtenerPorUuid(uuid));
+    public VentaResponse obtenerPorUuid(@PathVariable UUID uuid) {
+        return ventaService.obtenerPorUuid(uuid);
     }
 
     @PatchMapping("/{id}/anular")
-    public ResponseEntity<VentaResponse> anular(@PathVariable Long id) {
-        return ResponseEntity.ok(ventaService.anular(id));
+    public VentaResponse anular(@PathVariable Long id) {
+        return ventaService.anular(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
         ventaService.eliminar(id);
-        return ResponseEntity.noContent().build(); // Retorna HTTP 204
     }
 }

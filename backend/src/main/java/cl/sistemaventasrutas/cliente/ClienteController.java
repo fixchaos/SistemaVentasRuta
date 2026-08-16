@@ -10,7 +10,7 @@ public class ClienteController {
 
     private final ClienteService clienteService;
 
-    public ClienteController(ClienteService clienteService) {
+    public ClienteController(ClienteService clienteService){
         this.clienteService = clienteService;
     }
 
@@ -22,7 +22,7 @@ public class ClienteController {
     }
 
     @GetMapping
-    public List<ClienteResponse> listar() {
+    public List<ClienteResponse> listar(){
         return clienteService.listar();
     }
 
@@ -32,6 +32,7 @@ public class ClienteController {
     }
 
     @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ClienteResponse actualizar(
         @PathVariable Long id,
         @Valid @RequestBody ClienteRequest request){
@@ -39,12 +40,14 @@ public class ClienteController {
     }
 
     @PatchMapping("/{id}/reactivar")
+    @ResponseStatus(HttpStatus.OK)
     public ClienteResponse reactivar(@PathVariable Long id){
         return clienteService.reactivar(id);
     }
 
     @DeleteMapping("/{id}")
-    public ClienteResponse eliminar(@PathVariable Long id) {
-        return clienteService.eliminar(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id){
+        clienteService.eliminar(id);
     }
 }
