@@ -1,5 +1,8 @@
 package cl.sistemaventasrutas.venta;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,12 +64,29 @@ public class VentaService {
         return VentaResponse.from(venta);
     }
 
-    public List<VentaResponse> listar() {
-        // Mejora: Simplificación con Streams
-        return ventaRepository.findAll().stream()
-                .map(VentaResponse::from)
-                .toList();
+    public List<VentaResponse> listar(LocalDate fecha, EstadoVenta estado){
+        ZoneId zonaChile = ZoneId.of("America/Santiago");
+        List<Venta> ventas;
+
+        if(fecha != null && estado != null){
+            Instant inicio = fecha.atStartOfDay(zonaChile).toInstant();
+            Instant fin = fecha.plusDays(1).atStartOfDay(zonaChile).toInstant();
+            ventas = ventaRepository.findByFechaGreaterThanEqualAndFechaLessThanAndEstadoVenta(inicio, fin, estado);
+        }
+        else if(fecha != null){
+            Instant inicio = fecha.atStartOfDay(zonaChile).toInstant();
+            Instant fin = fecha.plusDays(1).atStartOfDay(zonaChile).toInstant();
+            ventas = ventaRepository.findByFechaGreaterThanEqualAndFechaLessThan(inicio, fin);
+        }
+        else if(estado != null){
+            ventas = ventaRepository.findByEstadoVenta(estado);
+        }
+        else{
+            ventas = ventaRepository.findAll();
+        }
+        return ventas.stream().map(VentaResponse::from).toList();
     }
+
 
     public VentaResponse obtenerPorId(Long id) {
         return VentaResponse.from(buscarVenta(id));
@@ -134,7 +154,4 @@ public class VentaService {
             detalle.getProducto().aumentarStock(detalle.getCantidad());
         }
     }
-
-
-
 }

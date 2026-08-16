@@ -1,10 +1,14 @@
 package cl.sistemaventasrutas.venta;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +24,7 @@ import cl.sistemaventasrutas.producto.Producto;
 import cl.sistemaventasrutas.producto.ProductoRepository;
 import cl.sistemaventasrutas.ruta.Ruta;
 import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+
 
 @ExtendWith(MockitoExtension.class)
 public class VentaServiceTest {
@@ -139,6 +144,71 @@ public class VentaServiceTest {
         // Assert
         assertEquals("ANULADA", response.estadoVenta());
         assertEquals(60L, producto.getStock()); // Devuelve stock: 50 + 10 = 60
+    }
+
+    @Test
+    void deberiaListarVentasPorEstado() {
+        // Arrange
+        Venta venta = crearVentaValida();
+
+        when(ventaRepository.findByEstadoVenta(EstadoVenta.CONFIRMADA)).thenReturn(List.of(venta));
+        // Act
+        List <VentaResponse> response = ventaService.listar(null, EstadoVenta.CONFIRMADA);
+
+        //Assert
+        assertEquals(1, response.size());
+        assertEquals("CONFIRMADA", response.get(0).estadoVenta());
+
+        verify(ventaRepository).findByEstadoVenta(EstadoVenta.CONFIRMADA);
+
+    }
+
+    @Test
+    void deberiaListarVentasPorFecha(){
+        // Arrange
+        Venta venta = crearVentaValida();
+        LocalDate fecha = LocalDate.of(2026, 8 , 16);
+
+        when(ventaRepository.findByFechaGreaterThanEqualAndFechaLessThan(
+            any(Instant.class),
+            any(Instant.class)
+        )).thenReturn(List.of(venta));
+
+        // Act
+        List<VentaResponse> response = ventaService.listar(fecha, null);
+
+        // Assert
+        assertEquals(1, response.size());
+
+        verify(ventaRepository).findByFechaGreaterThanEqualAndFechaLessThan(
+            any(Instant.class),
+            any(Instant.class));
+    }
+
+    @Test
+    void deberiaListarVentasPorFechaYEstado(){
+        // Arrange
+        Venta venta = crearVentaValida();
+        LocalDate fecha = LocalDate.of(2026, 8, 16);
+
+        when(ventaRepository.findByFechaGreaterThanEqualAndFechaLessThanAndEstadoVenta(
+            any(Instant.class),
+            any(Instant.class),
+            eq(EstadoVenta.CONFIRMADA))).thenReturn(List.of(venta));
+
+        // Act
+        List<VentaResponse> response = ventaService.listar(fecha, EstadoVenta.CONFIRMADA);
+
+        // Assert
+        assertEquals(1, response.size());
+        assertEquals("CONFIRMADA", response.get(0).estadoVenta());
+
+        verify(ventaRepository)
+            .findByFechaGreaterThanEqualAndFechaLessThanAndEstadoVenta(
+                any(Instant.class),
+                any(Instant.class),
+                eq(EstadoVenta.CONFIRMADA));
+
     }
 
     // ==========================================
