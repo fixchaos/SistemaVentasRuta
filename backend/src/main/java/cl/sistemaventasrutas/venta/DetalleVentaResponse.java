@@ -7,5 +7,16 @@ public record DetalleVentaResponse(
     String nombre,
     Long cantidad,
     Long precioUnitario,
-    Long subtotal) {
+    Long subtotal
+) {
+    public static DetalleVentaResponse from(DetalleVenta detalle){
+        return new DetalleVentaResponse(
+            detalle.getProducto().getId(),
+            detalle.getProducto().getCodigo(),
+            detalle.getProducto().getNombre(),
+            detalle.getCantidad(),
+            detalle.getPrecioUnitario(),
+            detalle.getSubtotal()
+        );
     }
+}

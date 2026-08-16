@@ -12,4 +12,17 @@ public record ProductoResponse(
         boolean activo
 
 ) {
+        public static ProductoResponse from(Producto producto){
+                return new ProductoResponse(
+                        producto.getId(),
+                        producto.getCodigo(),
+                        producto.getNombre(),
+                        producto.getUnidad(),
+                        producto.getPrecioCosto(),
+                        producto.getPrecioVenta(),
+                        producto.getStock(),
+                        producto.isActivo()
+
+                );
+        }
 }

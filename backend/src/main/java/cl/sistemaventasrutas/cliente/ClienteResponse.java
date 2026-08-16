@@ -11,4 +11,15 @@ public record ClienteResponse(
         boolean activo
 
 ) {
+        public static ClienteResponse from(Cliente cliente){
+                return new ClienteResponse(
+                        cliente.getId(),
+                        cliente.getNombre(),
+                        cliente.getTelefono(),
+                        cliente.getDireccion(),
+                        cliente.getRuta().getId(),
+                        cliente.getRuta().getNombre(),
+                        cliente.isActivo()
+                );
+        }
 }

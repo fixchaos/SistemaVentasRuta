@@ -58,25 +58,25 @@ public class VentaService {
         venta.calcularTotales();
         ventaRepository.save(venta);
 
-        return toResponse(venta);
+        return VentaResponse.from(venta);
     }
 
     public List<VentaResponse> listar() {
         // Mejora: Simplificación con Streams
         return ventaRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(VentaResponse::from)
                 .toList();
     }
 
     public VentaResponse obtenerPorId(Long id) {
-        return toResponse(buscarVenta(id));
+        return VentaResponse.from(buscarVenta(id));
     }
 
     // Mejora opcional: Buscar por UUID para el frontend
     public VentaResponse obtenerPorUuid(UUID uuid) {
         Venta venta = ventaRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
-        return toResponse(venta);
+        return VentaResponse.from(venta);
     }
 
     @Transactional // Permiso de escritura
@@ -91,7 +91,7 @@ public class VentaService {
         restaurarStock(venta);
 
         venta.anular();
-        return toResponse(venta);
+        return VentaResponse.from(venta);
     }
 
     @Transactional
@@ -135,35 +135,6 @@ public class VentaService {
         }
     }
 
-    private VentaResponse toResponse(Venta venta) {
-        List<DetalleVentaResponse> items = venta.getDetalles()
-                .stream()
-                .map(this::convertirDetalleAResponse)
-                .toList();
 
-        return new VentaResponse(
-            venta.getId(),
-            venta.getUuid(),
-            venta.getCliente().getId(),
-            venta.getCliente().getNombre(),
-            venta.getFecha(),
-            venta.getNeto(),
-            venta.getIva(),
-            venta.getTotal(),
-            venta.getEstadoPago().name(),
-            venta.getEstadoVenta().name(),
-            items
-        );
-    }
 
-    private DetalleVentaResponse convertirDetalleAResponse(DetalleVenta detalle) {
-        return new DetalleVentaResponse(
-            detalle.getProducto().getId(),
-            detalle.getProducto().getCodigo(),
-            detalle.getProducto().getNombre(),
-            detalle.getCantidad(),
-            detalle.getPrecioUnitario(),
-            detalle.getSubtotal()
-        );
-    }
 }

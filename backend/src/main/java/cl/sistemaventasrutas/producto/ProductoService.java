@@ -40,7 +40,7 @@ public class ProductoService {
 
         producto = productoRepository.save(producto);
 
-        return toResponse(producto);
+        return ProductoResponse.from(producto);
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +49,7 @@ public class ProductoService {
         return productoRepository
                 .findAllByActivoTrueOrderByNombreAsc()
                 .stream()
-                .map(this::toResponse)
+                .map(ProductoResponse::from)
                 .toList();
     }
 
@@ -64,17 +64,5 @@ public class ProductoService {
         producto.desactivar();
     }
 
-    private ProductoResponse toResponse(
-            Producto producto) {
 
-        return new ProductoResponse(
-                producto.getId(),
-                producto.getCodigo(),
-                producto.getNombre(),
-                producto.getUnidad(),
-                producto.getPrecioCosto(),
-                producto.getPrecioVenta(),
-                producto.getStock(),
-                producto.isActivo());
-    }
 }

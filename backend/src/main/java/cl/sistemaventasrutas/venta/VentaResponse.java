@@ -18,4 +18,25 @@ public record VentaResponse(
         String estadoVenta,
         List<DetalleVentaResponse> items
 ) {
+
+public static VentaResponse from(Venta venta){
+        List<DetalleVentaResponse> items = venta.getDetalles()
+                .stream()
+                .map(DetalleVentaResponse::from)
+                .toList();
+
+        return new VentaResponse(
+                venta.getId(),
+                venta.getUuid(),
+                venta.getCliente().getId(),
+                venta.getCliente().getNombre(),
+                venta.getFecha(),
+                venta.getNeto(),
+                venta.getIva(),
+                venta.getTotal(),
+                venta.getEstadoPago().name(),
+                venta.getEstadoVenta().name(),
+                items
+        );
+}
 }

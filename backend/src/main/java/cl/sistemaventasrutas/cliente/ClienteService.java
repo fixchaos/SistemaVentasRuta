@@ -43,7 +43,7 @@ public class ClienteService {
             request.direccion(),
             ruta);
             cliente = clienteRepository.save(cliente);
-            return toResponse(cliente);
+            return ClienteResponse.from(cliente);
         }
 
     @Transactional(readOnly = true)
@@ -51,14 +51,14 @@ public class ClienteService {
     return clienteRepository
         .findAllByActivoTrueOrderByNombreAsc()
         .stream()
-        .map(this::toResponse)
+        .map(ClienteResponse::from)
         .toList();
     }
 
     @Transactional(readOnly = true)
     public ClienteResponse obtenerPorId(Long id){
         Cliente cliente = buscarClienteActivo(id);
-        return toResponse(cliente);
+        return ClienteResponse.from(cliente);
     }
 
     public ClienteResponse actualizar(Long id, ClienteRequest request){
@@ -77,19 +77,19 @@ public class ClienteService {
             request.telefono(),
             request.direccion(),
              ruta);
-        return toResponse(cliente);
+        return ClienteResponse.from(cliente);
     }
 
     public ClienteResponse reactivar(Long id){
         Cliente cliente = buscarCliente(id);
         cliente.reactivar();
-        return toResponse(cliente);
+        return ClienteResponse.from(cliente);
     }
 
     public ClienteResponse eliminar(Long id) {
         Cliente cliente = buscarClienteActivo(id);
         cliente.desactivar();
-        return toResponse(cliente);
+        return ClienteResponse.from(cliente);
     }
 
     //Métodos privados
@@ -110,15 +110,4 @@ public class ClienteService {
         .orElseThrow(()-> new IllegalArgumentException(Mensajes.RUTA_NO_ENCONTRADA));
     }
 
-    private ClienteResponse toResponse(Cliente cliente) {
-        return new ClienteResponse(
-            cliente.getId(),
-            cliente.getNombre(),
-            cliente.getTelefono(),
-            cliente.getDireccion(),
-            cliente.getRuta().getId(),
-            cliente.getRuta().getNombre(),
-            cliente.isActivo()
-            );
-        }
-    }
+}
