@@ -88,10 +88,7 @@ public class VentaService {
             throw new IllegalStateException("La venta ya se encuentra anulada.");
         }
 
-        for (DetalleVenta detalle : venta.getDetalles()) {
-            Producto producto = detalle.getProducto();
-            producto.aumentarStock(detalle.getCantidad());
-        }
+        restaurarStock(venta);
 
         venta.anular();
         return toResponse(venta);
@@ -103,10 +100,7 @@ public class VentaService {
 
         // Opcional: Si la venta NO estaba anulada, reponer el stock antes de borrarla de la BD
         if (venta.getEstadoVenta() != EstadoVenta.ANULADA) {
-            for (DetalleVenta detalle : venta.getDetalles()) {
-                Producto producto = detalle.getProducto();
-                producto.aumentarStock(detalle.getCantidad());
-            }
+            restaurarStock(venta);
         }
 
         ventaRepository.delete(venta);
@@ -132,6 +126,12 @@ public class VentaService {
     private void validarStock(Producto producto, Long cantidadSolicitada) {
         if (producto.getStock().compareTo(cantidadSolicitada) < 0) {
             throw new IllegalArgumentException("Stock insuficiente para el producto: " + producto.getNombre());
+        }
+    }
+
+    private void restaurarStock(Venta venta){
+        for(DetalleVenta detalle : venta.getDetalles()){
+            detalle.getProducto().aumentarStock(detalle.getCantidad());
         }
     }
 

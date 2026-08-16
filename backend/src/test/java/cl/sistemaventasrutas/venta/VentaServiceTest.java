@@ -92,7 +92,7 @@ public class VentaServiceTest {
         VentaRequest ventaRequest = new VentaRequest(1L, EstadoPago.PAGADO, List.of(itemRequest));
 
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
-        when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(producto));
 
         // Act
         VentaResponse response = ventaService.crear(ventaRequest);
@@ -114,7 +114,7 @@ public class VentaServiceTest {
         VentaRequest ventaRequest = new VentaRequest(1L, EstadoPago.PAGADO, List.of(itemRequest));
 
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
-        when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(producto));
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(
@@ -154,7 +154,7 @@ public class VentaServiceTest {
     }
 
     private Producto crearProducto(String codigo, Long stock) {
-        return new Producto(codigo, "Bolsa Papel Kraft", 300L, 600L, stock);
+        return new Producto(codigo, "Bolsa Papel Kraft","kg", 300L, 600L, stock);
     }
 
     private Venta crearVentaValida() {
