@@ -195,3 +195,47 @@ Aunque algunos totales se pueden calcular, se guardan en la venta para conservar
 
 - Confirmar la tasa inicial de IVA con una fuente oficial.
 - Elegir la tecnologia del panel web para PC.
+
+## 9. Estado de implementación
+
+Este documento define el modelo de datos objetivo del sistema. No todas las
+tablas, entidades y relaciones descritas se encuentran implementadas
+actualmente en Spring Boot.
+
+### Implementado actualmente
+
+- `RUTA`: tabla, entidad JPA y operaciones principales implementadas.
+- `CLIENTE`: tabla, entidad JPA y operaciones principales implementadas.
+- `PRODUCTO`: tabla, entidad JPA y operaciones principales implementadas.
+- `VENTA`: tabla, entidad JPA y operaciones principales implementadas.
+- `DETALLE_VENTA`: tabla, entidad JPA y relación con `VENTA` implementadas.
+- `USUARIO`: tabla creada en la base de datos, pero su entidad JPA,
+  autenticación y autorización quedan pendientes.
+
+### Preparado para etapas posteriores
+
+Las siguientes estructuras existen en la base de datos, pero todavía no
+cuentan con entidades JPA ni lógica de negocio implementada:
+- `MOVIMIENTO_PAGO`
+- `MOVIMIENTO_STOCK`
+- `REVISION_VENTA`
+- `DETALLE_REVISION_VENTA`
+
+La asociación `VENTA.usuario_id` y `REVISION_VENTA.usuario_id` forma parte del
+modelo de datos previsto, pero queda pendiente de implementación junto con el
+sistema de usuarios, autenticación y autorización.
+
+La implementación de estas relaciones se realizará en una etapa posterior,
+junto con la definición de los roles `VENDEDOR` y `ADMINISTRADOR`.
+
+### Migraciones y entidades JPA
+
+Las migraciones de Flyway representan la evolución del esquema de la base de
+datos. Las migraciones existentes no deben modificarse una vez ejecutadas;
+cualquier cambio posterior del esquema deberá realizarse mediante una nueva
+migración.
+
+Hibernate/JPA valida mediante `ddl-auto=validate` únicamente las tablas,
+columnas y relaciones que forman parte del modelo de entidades JPA actualmente
+implementado. Por lo tanto, la existencia de tablas futuras en la base de datos
+no implica que dichas funcionalidades estén implementadas en Spring Boot.

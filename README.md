@@ -76,12 +76,7 @@ Actualmente el backend se encuentra operativo y las principales funcionalidades 
 - Pagos parciales
 
 ## Roadmap
-
-- [x] Gestión de clientes
-- [x] Gestión de productos
-- [x] Gestión de rutas
-- [x] Registro de ventas
-- [x] Pruebas unitarias
+- [ ] Autenticación y Autorización
 - [ ] Movimientos de stock
 - [ ] Pagos parciales
 - [ ] Aplicación Android
