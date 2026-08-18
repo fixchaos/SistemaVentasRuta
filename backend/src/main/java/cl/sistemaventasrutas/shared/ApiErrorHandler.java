@@ -1,7 +1,7 @@
 package cl.sistemaventasrutas.shared;
 
 import java.time.Instant;
-
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,5 +40,12 @@ public class ApiErrorHandler {
                 .orElse("Error de validación en la petición");
 
         return new ErrorResponse(Instant.now(), mensajeError);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOptimisticLockingException(
+        ObjectOptimisticLockingFailureException ex){
+            return new ErrorResponse(Instant.now(),"El producto fue modificado por otra operación. Intente nuevamente");
     }
 }

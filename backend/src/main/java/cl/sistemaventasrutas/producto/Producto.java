@@ -1,5 +1,6 @@
 package cl.sistemaventasrutas.producto;
 
+import jakarta.persistence.Version;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +36,11 @@ public class Producto {
 
     @Column(nullable = false)
     private boolean activo = true;
+
+    @Version
+    @Column(nullable = false)
+    private Integer version;
+
 
     protected Producto() {
     }
