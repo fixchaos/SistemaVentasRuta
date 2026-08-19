@@ -106,7 +106,7 @@ public class ClienteService {
 
     private Ruta buscarRuta(Long rutaId){
         return rutaRepository.findByIdAndActivoTrue(rutaId)
-        .orElseThrow(()-> new IllegalArgumentException(Mensajes.RUTA_NO_ENCONTRADA));
+        .orElseThrow(()-> new ResourceNotFoundException (Mensajes.RUTA_NO_ENCONTRADA));
     }
 
 }

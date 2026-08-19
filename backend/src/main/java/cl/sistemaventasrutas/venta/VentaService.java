@@ -9,11 +9,13 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import cl.sistemaventasrutas.cliente.Cliente;
 import cl.sistemaventasrutas.cliente.ClienteRepository;
 import cl.sistemaventasrutas.producto.Producto;
 import cl.sistemaventasrutas.producto.ProductoRepository;
 import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+import cl.sistemaventasrutas.shared.Mensajes;
 
 @Service
 @Transactional(readOnly = true) // Optimiza lecturas en la BD por defecto
@@ -95,7 +97,7 @@ public class VentaService {
     // Mejora opcional: Buscar por UUID para el frontend
     public VentaResponse obtenerPorUuid(UUID uuid) {
         Venta venta = ventaRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException(Mensajes.VENTA_NO_ENCONTRADA));
         return VentaResponse.from(venta);
     }
 
@@ -130,17 +132,17 @@ public class VentaService {
 
     private Cliente buscarCliente(Long clienteId) {
         return clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException(Mensajes.CLIENTE_NO_ENCONTRADO));
     }
 
     private Producto buscarProducto(Long productoId) {
         return productoRepository.findByIdAndActivoTrue(productoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException(Mensajes.PRODUCTO_NO_ENCONTRADO));
     }
 
     private Venta buscarVenta(Long ventaId) {
         return ventaRepository.findById(ventaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException(Mensajes.VENTA_NO_ENCONTRADA));
     }
 
     private void validarStock(Producto producto, Long cantidadSolicitada) {
