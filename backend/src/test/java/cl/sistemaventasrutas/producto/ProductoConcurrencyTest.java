@@ -1,4 +1,5 @@
 package cl.sistemaventasrutas.producto;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,111 +12,115 @@ import java.util.concurrent.Future;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class ProductoConcurrencyTest {
 
-    @Autowired
-    private ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired
-    private TransactionTemplate transactionTemplate;
+    ProductoConcurrencyTest(
+        ProductoRepository productoRepository,
+        TransactionTemplate transactionTemplate){
 
-    private Long productoId;
+            this.productoRepository = productoRepository;
+            this.transactionTemplate = transactionTemplate;
+        }
 
-    @BeforeEach
-    void prepararProducto() {
-        Producto producto = new Producto(
+        private Long productoId;
+
+        @BeforeEach
+        void prepararProducto(){
+            Producto producto = new Producto(
                 "CONC-001",
-                "Producto concurrencia",
+                "Producto prueba",
                 "unidad",
                 100L,
                 200L,
                 5L
-        );
+            );
 
-        producto = productoRepository.saveAndFlush(producto);
-        productoId = producto.getId();
-    }
-
-    @AfterEach
-    void limpiar() {
-        if (productoId != null) {
-            productoRepository.deleteById(productoId);
+            producto = productoRepository.saveAndFlush(producto);
+            productoId = producto.getId();
         }
-    }
 
-    @Test
-    void deberiaRechazarUnaModificacionConcurrentePorVersion() throws Exception {
+        @AfterEach
+        void limpiar(){
+            if(productoId != null){
+                productoRepository.deleteById(productoId);
+            }
+        }
 
-        CountDownLatch ambosLeyeron = new CountDownLatch(2);
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        @Test
+        void deberiaRechazarUnaModificacionConcurrentePorVersion() throws Exception{
+            CountDownLatch ambosLeyeron = new CountDownLatch(2);
+            ExecutorService executor = Executors.newFixedThreadPool(2);
 
-        try {
-            Future<String> modificacionA = executor.submit(() ->
+            try {
+                Future<String> modificacionA = executor.submit(()->
                     ejecutarModificacionConcurrente(ambosLeyeron));
 
-            Future<String> modificacionB = executor.submit(() ->
+                Future<String> modificacionB = executor.submit(()->
                     ejecutarModificacionConcurrente(ambosLeyeron));
 
-            String resultadoA = modificacionA.get();
-            String resultadoB = modificacionB.get();
+                String resultadoA = modificacionA.get();
+                String resultadoB = modificacionB.get();
 
-            List<String> resultados = List.of(resultadoA, resultadoB);
+                List<String> resultados = List.of(resultadoA, resultadoB);
 
-            assertEquals(1, resultados.stream()
+                assertEquals(1, resultados.stream()
                     .filter("OK"::equals)
                     .count());
 
-            assertEquals(1, resultados.stream()
+                assertEquals(1, resultados.stream()
                     .filter("CONFLICTO"::equals)
                     .count());
 
-            Producto productoFinal = productoRepository
+                Producto productoFinal = productoRepository
                     .findById(productoId)
                     .orElseThrow();
 
-            assertEquals(0L, productoFinal.getStock());
 
-        } finally {
-            executor.shutdownNow();
+                assertEquals(0L, productoFinal.getStock());
+            }finally{
+                executor.shutdownNow();
+            }
         }
-    }
 
-    private String ejecutarModificacionConcurrente(
-            CountDownLatch ambosLeyeron) {
+        private String ejecutarModificacionConcurrente(
+            CountDownLatch ambosLeyeron){
+                try{
+                    transactionTemplate.executeWithoutResult(status ->{
+                        Producto producto = productoRepository
+                            .findByIdAndActivoTrue(productoId)
+                            .orElseThrow();
 
-        try {
-            transactionTemplate.executeWithoutResult(status -> {
+                        assertEquals(5L, producto.getStock());
 
-                Producto producto = productoRepository
-                        .findByIdAndActivoTrue(productoId)
-                        .orElseThrow();
+                        ambosLeyeron.countDown();
 
-                assertEquals(5L, producto.getStock());
+                        try{
+                            ambosLeyeron.await();
+                        }catch(InterruptedException e){
+                            Thread.currentThread().interrupt();
+                            throw new RuntimeException(e);
+                        }
 
-                ambosLeyeron.countDown();
+                        producto.descontarStock(5l);
+                        productoRepository.saveAndFlush(producto);
+                    });
 
-                try {
-                    ambosLeyeron.await();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException(e);
+                    return "OK";
+                } catch(ObjectOptimisticLockingFailureException ex){
+                    return "CONFLICTO";
                 }
+            }
 
-                producto.descontarStock(5L);
 
-                productoRepository.saveAndFlush(producto);
-            });
-
-            return "OK";
-
-        } catch (ObjectOptimisticLockingFailureException ex) {
-            return "CONFLICTO";
-        }
-    }
 }
