@@ -42,7 +42,6 @@ public class Usuario {
     private boolean activo = true;
 
     protected Usuario(){
-        System.out.println("Constructor vacío de Usuario ejecutado");
     }
 
     public Usuario(

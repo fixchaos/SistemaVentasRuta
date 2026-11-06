@@ -3,6 +3,7 @@ package cl.sistemaventasrutas.usuario;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -42,11 +43,15 @@ public class UsuarioController {
         return usuarioService.desactivar(id);
     }
 
-    @PatchMapping("/{id}/password")
+    @PatchMapping("/me/password")
     public UsuarioResponse cambiarPassword(
-            @PathVariable Long id,
-            @Valid @RequestBody CambiarPasswordRequest request
-    ) {
-        return usuarioService.cambiarPassword(id, request.nuevaPassword());
+        Authentication authentication,
+        @Valid @RequestBody CambiarPasswordRequest request
+    ){
+        return usuarioService.cambiarPassword(
+            authentication,
+            request.passwordActual(),
+            request.nuevaPassword()
+        );
     }
 }

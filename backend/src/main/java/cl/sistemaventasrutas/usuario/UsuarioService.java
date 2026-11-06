@@ -2,9 +2,11 @@ package cl.sistemaventasrutas.usuario;
 
 import cl.sistemaventasrutas.shared.Mensajes;
 import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -81,8 +83,20 @@ public class UsuarioService {
         return UsuarioResponse.from(usuario);
     }
 
-    public UsuarioResponse cambiarPassword(Long id, String nuevaPassword) {
-        Usuario usuario = buscarUsuario(id);
+    public UsuarioResponse cambiarPassword(
+        Authentication authentication,
+        String passwordActual,
+        String nuevaPassword
+    ){
+        String username = authentication.getName();
+
+        Usuario usuario = usuarioRepository.findByUsername(username)
+            .orElseThrow(() ->
+                new ResourceNotFoundException(Mensajes.USUARIO_NO_ENCONTRADO)
+        );
+        if(!passwordEncoder.matches(passwordActual, usuario.getPasswordHash())){
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
 
         String passwordHash = passwordEncoder.encode(nuevaPassword);
         usuario.cambiarPassword(passwordHash);
