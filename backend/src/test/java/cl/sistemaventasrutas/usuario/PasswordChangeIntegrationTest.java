@@ -137,38 +137,48 @@ class PasswordChangeIntegrationTest {
             );
     }
 
-    @Test
-    void deberiaRechazarCambioCuandoPasswordActualEsIncorrecta() throws Exception{
 
-        //Generar un token JWT para autenticar la petición
+    @Test
+    void deberiaRechazarCambioCuandoPasswordActualEsIncorrecta() throws Exception {
+
+        // Generar un token JWT para autenticar la petición
         String token = generarToken();
 
-        //Intenta cambiar la contraseña utilizando una contraseña actual incorrecta
+        // Intentar cambiar la contraseña utilizando una contraseña actual incorrecta
         mockMvc.perform(
             patch("/api/usuarios/me/password")
-            .header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("""
-                {
-                    "passwordActual": "ContraseñaIncorrecta123",
-                    "nuevaPassword": "NuevaClave123"
-                }
-
-              """)
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "passwordActual": "ContraseñaIncorrecta123",
+                        "nuevaPassword": "NuevaClave123"
+                    }
+                    """)
         )
         .andExpect(status().isBadRequest());
 
-        //Recuperar usuario para comprobar si contraseña original sigue intacta
+        // Recuperar el usuario para comprobar si la contraseña original sigue intacta
         Usuario usuarioActualizado = usuarioRepository
             .findByUsername("passwordTest")
             .orElseThrow();
 
-        //Comprueba que la contraseña original sigue seiendo válida
-        assertTrue(
-            passwordEncoder.matches(
-                "ClaveActual123",
-                usuarioActualizado.getPasswordHash()
-            )
+        // Comprobar si la contraseña original sigue siendo válida
+        boolean contraseñaOriginalValida = passwordEncoder.matches(
+            "ClaveActual123",
+            usuarioActualizado.getPasswordHash()
         );
+
+        // Comprobar si la nueva contraseña fue almacenada
+        boolean contraseñaNuevaValida = passwordEncoder.matches(
+            "NuevaClave123",
+            usuarioActualizado.getPasswordHash()
+        );
+
+        // La contraseña original debe seguir siendo válida
+        assertTrue(contraseñaOriginalValida);
+
+        // La nueva contraseña no debe haber sido almacenada
+        assertFalse(contraseñaNuevaValida);
     }
 }
