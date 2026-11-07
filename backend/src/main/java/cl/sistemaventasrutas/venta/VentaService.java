@@ -116,18 +116,6 @@ public class VentaService {
         return VentaResponse.from(venta);
     }
 
-    @Transactional
-    public void eliminar(Long id) {
-        Venta venta = buscarVenta(id);
-
-        // Opcional: Si la venta NO estaba anulada, reponer el stock antes de borrarla de la BD
-        if (venta.getEstadoVenta() != EstadoVenta.ANULADA) {
-            restaurarStock(venta);
-        }
-
-        ventaRepository.delete(venta);
-    }
-
     // --- Métodos Auxiliares ---
 
     private Cliente buscarCliente(Long clienteId) {
