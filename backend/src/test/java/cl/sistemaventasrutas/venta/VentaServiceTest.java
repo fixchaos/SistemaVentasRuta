@@ -59,9 +59,9 @@ public class VentaServiceTest {
         assertEquals("La Pica del Hornito", response.clienteNombre());
         assertEquals("PAGADO", response.estadoPago());
         assertEquals("CONFIRMADA", response.estadoVenta());
-        assertEquals(900L, response.neto());
-        assertEquals(171L, response.iva());
-        assertEquals(1071L, response.total());
+        assertEquals(756L, response.neto());
+        assertEquals(144L, response.iva());
+        assertEquals(900L, response.total());
         assertEquals(1, response.items().size());
 
         // Verificaciones del detalle

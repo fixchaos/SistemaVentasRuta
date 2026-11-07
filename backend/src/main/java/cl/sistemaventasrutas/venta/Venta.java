@@ -1,25 +1,27 @@
 package cl.sistemaventasrutas.venta;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
-
-import cl.sistemaventasrutas.cliente.Cliente;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Version;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+
+import cl.sistemaventasrutas.cliente.Cliente;
+
 
 @Entity
 @Table(name="ventas")
@@ -82,18 +84,25 @@ public class Venta {
 
         public void calcularTotales() {
 
-            // Calcular el neto sumando los subtotales de todos los detalles.
-            long neto = 0;
-            for (DetalleVenta detalle : detalles) {
-                neto += detalle.getSubtotal();
+            //El total corresponde a la suma de los precios con IVA incluido.
+            long total = 0;
+
+            for(DetalleVenta detalle : detalles){
+                total += detalle.getSubtotal();
             }
 
-            this.neto = neto;
+            this.total = total;
 
-           BigDecimal ivaCalculado = BigDecimal.valueOf(this.neto).multiply(this.tasaIva);
-           this.iva = ivaCalculado.longValue();
+            //Separar IVA del precio que ya lo incluye
+            BigDecimal divisor = BigDecimal.ONE.add(this.tasaIva);
 
-           this.total = this.neto + this.iva;
+            BigDecimal netoCalculado = BigDecimal.valueOf(this.total)
+                .divide(divisor, 0, RoundingMode.HALF_UP);
+
+            this.neto = netoCalculado.longValueExact();
+
+            //Calcular iva
+            this.iva = this.total - this.neto;
         }
 
         public Long getId() {
