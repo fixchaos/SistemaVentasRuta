@@ -42,7 +42,7 @@ public class DetalleVenta {
         this.producto = producto;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
-        this.subtotal = cantidad * precioUnitario;
+        this.subtotal = Math.multiplyExact(cantidad, precioUnitario);
     }
 
     public Long getId() {
@@ -69,5 +69,3 @@ public class DetalleVenta {
         return subtotal;
     }
 }
-
-

@@ -48,4 +48,13 @@ public class ApiErrorHandler {
         ObjectOptimisticLockingFailureException ex){
             return new ErrorResponse(Instant.now(),"El producto fue modificado por otra operación. Intente nuevamente");
     }
+
+    @ExceptionHandler(ArithmeticException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleArithmeticException(ArithmeticException ex) {
+        return new ErrorResponse(
+            Instant.now(),
+            "El importe de la venta excede el rango permitido"
+        );
+    }
 }

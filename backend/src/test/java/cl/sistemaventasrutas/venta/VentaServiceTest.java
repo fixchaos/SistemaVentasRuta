@@ -216,6 +216,50 @@ public class VentaServiceTest {
 
     }
 
+    @Test
+    void deberiaDetectarDesbordamientoAlCalcularSubtotal() {
+
+        //Arrange
+        Venta venta = crearVentaValida();
+        Producto producto = crearProducto("PAP002", 100L);
+
+        //Act & Assert
+        assertThrows(
+            ArithmeticException.class,
+            () -> new DetalleVenta(
+                venta,
+                producto,
+                2L,
+                Long.MAX_VALUE
+            )
+        );
+    }
+
+    @Test
+    void deberiaDetectarDesbordamientoAlCalcularTotal() {
+
+        //Arrange
+        Cliente cliente = crearCliente();
+        Producto producto = crearProducto("PAP003", 100L);
+
+        Venta venta = new Venta(cliente, EstadoPago.PAGADO);
+
+        DetalleVenta detalle1 =
+            new DetalleVenta(venta, producto, 1L, Long.MAX_VALUE);
+
+        DetalleVenta detalle2 =
+            new DetalleVenta(venta, producto, 1L, 1L);
+
+        venta.agregarDetalle(detalle1);
+        venta.agregarDetalle(detalle2);
+
+        //Act & Assert
+        assertThrows(
+            ArithmeticException.class,
+            venta::calcularTotales
+        );
+    }
+
     // ==========================================
     // 2. MÉTODOS AUXILIARES (HELPERS)
     // ==========================================

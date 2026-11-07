@@ -87,8 +87,8 @@ public class Venta {
             //El total corresponde a la suma de los precios con IVA incluido.
             long total = 0;
 
-            for(DetalleVenta detalle : detalles){
-                total += detalle.getSubtotal();
+            for (DetalleVenta detalle : detalles) {
+                total = Math.addExact(total, detalle.getSubtotal());
             }
 
             this.total = total;
