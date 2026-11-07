@@ -93,7 +93,7 @@ public class VentaServiceTest {
         Cliente cliente = crearCliente();
         Producto producto = crearProducto("PAP001", 100L); // Stock inicial 100
 
-        VentaItemRequest itemRequest = new VentaItemRequest(1L, 5L, 600L); // Solicita 5
+        VentaItemRequest itemRequest = new VentaItemRequest(1L, 5L); // Solicita 5
         VentaRequest ventaRequest = new VentaRequest(1L, EstadoPago.PAGADO, List.of(itemRequest));
 
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
@@ -106,6 +106,11 @@ public class VentaServiceTest {
         assertNotNull(response);
         assertEquals("La Pica del Hornito", response.clienteNombre());
         assertEquals(95L, producto.getStock()); // Verifica descuento de stock (100 - 5 = 95)
+
+        DetalleVentaResponse detalle = response.items().get(0);
+
+        assertEquals(600L, detalle.precioUnitario());
+        assertEquals(3000L, detalle.subtotal());
         verify(ventaRepository).save(any(Venta.class));
     }
 
@@ -115,7 +120,7 @@ public class VentaServiceTest {
         Cliente cliente = crearCliente();
         Producto producto = crearProducto("PAP001", 2L); // Solo hay 2 en stock
 
-        VentaItemRequest itemRequest = new VentaItemRequest(1L, 10L, 600L); // Pide 10
+        VentaItemRequest itemRequest = new VentaItemRequest(1L, 10L); // Pide 10
         VentaRequest ventaRequest = new VentaRequest(1L, EstadoPago.PAGADO, List.of(itemRequest));
 
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));

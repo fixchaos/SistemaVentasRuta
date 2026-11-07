@@ -53,7 +53,7 @@ public class VentaService {
                 venta,
                 producto,
                 item.cantidad(),
-                item.precioUnitario()
+                producto.getPrecioVenta()
             );
 
             venta.agregarDetalle(detalle);
