@@ -9,4 +9,5 @@ public class Mensajes {
     public static final String RUTA_NO_ENCONTRADA = "Ruta no encontrado";
     public static final String PRODUCTO_NO_ENCONTRADO = "Producto no encontrado";
     public static final String VENTA_NO_ENCONTRADA = "Venta no encontrada";
+    public static final String USUARIO_NO_ENCONTRADO = "Usuario no encontrado";
 }
