@@ -98,10 +98,28 @@ public class Producto {
     }
 
     public void descontarStock(long cantidadVendida) {
-        this.stock -= cantidadVendida;
+        if (cantidadVendida <= 0) {
+            throw new IllegalArgumentException(
+                "La cantidad vendida debe ser mayor que cero"
+            );
+        }
+
+        if (stock < cantidadVendida) {
+            throw new IllegalArgumentException(
+                "Stock insuficiente para el producto: " + nombre
+            );
+        }
+
+        this.stock = Math.subtractExact(stock, cantidadVendida);
     }
 
     public void aumentarStock(long cantidad) {
-        this.stock += cantidad;
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException(
+                "La cantidad debe ser mayor que cero"
+            );
+        }
+
+    this.stock = Math.addExact(stock, cantidad);
     }
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.sistemaventasrutas.movimiento.MovimientoStockService;
+import cl.sistemaventasrutas.movimiento.TipoMovimientoStock;
 import cl.sistemaventasrutas.shared.Mensajes;
 import cl.sistemaventasrutas.shared.ResourceNotFoundException;
 
@@ -13,11 +15,14 @@ import cl.sistemaventasrutas.shared.ResourceNotFoundException;
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final MovimientoStockService movimientoStockService;
 
     public ProductoService(
-            ProductoRepository productoRepository) {
+            ProductoRepository productoRepository,
+            MovimientoStockService movimientoStockService) {
 
         this.productoRepository = productoRepository;
+        this.movimientoStockService = movimientoStockService;
     }
 
     public ProductoResponse crear(
@@ -39,6 +44,16 @@ public class ProductoService {
                 request.stock());
 
         producto = productoRepository.save(producto);
+
+        if (producto.getStock() > 0) {
+            movimientoStockService.registrar(
+                producto,
+                null,
+                TipoMovimientoStock.ENTRADA,
+                producto.getStock(),
+                "Stock inicial del producto"
+            );
+        }
 
         return ProductoResponse.from(producto);
     }

@@ -8,7 +8,7 @@ import jakarta.persistence.*;
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_usuario_rut", columnNames = "rut"),
         @UniqueConstraint(name = "uk_usuario_email", columnNames = "email"),
-        @UniqueConstraint(name = "uk_usuario_username", columnNames = "username")
+        @UniqueConstraint(name = "usuarios_username_key", columnNames = "username")
     }
 )
 

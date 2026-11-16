@@ -23,7 +23,10 @@ import cl.sistemaventasrutas.cliente.ClienteRepository;
 import cl.sistemaventasrutas.producto.Producto;
 import cl.sistemaventasrutas.producto.ProductoRepository;
 import cl.sistemaventasrutas.ruta.Ruta;
+import cl.sistemaventasrutas.movimiento.MovimientoStockService;
+import cl.sistemaventasrutas.movimiento.TipoMovimientoStock;
 import cl.sistemaventasrutas.shared.ResourceNotFoundException;
+
 
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +40,9 @@ public class VentaServiceTest {
 
     @Mock
     private ProductoRepository productoRepository;
+
+    @Mock
+    private MovimientoStockService movimientoStockService;
 
     @InjectMocks
     private VentaService ventaService;
@@ -78,12 +84,13 @@ public class VentaServiceTest {
         // Arrange
         when(ventaRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act & Assert
+        // Act
         ResourceNotFoundException exception = assertThrows(
             ResourceNotFoundException.class,
             () -> ventaService.obtenerPorId(999L)
         );
 
+        //Assert
         assertEquals("Venta no encontrada", exception.getMessage());
     }
 
@@ -96,8 +103,12 @@ public class VentaServiceTest {
         VentaItemRequest itemRequest = new VentaItemRequest(1L, 5L); // Solicita 5
         VentaRequest ventaRequest = new VentaRequest(1L, EstadoPago.PAGADO, List.of(itemRequest));
 
-        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
-        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(producto));
+        when(clienteRepository.findById(1L))
+            .thenReturn(Optional.of(cliente));
+        when(productoRepository.findByIdAndActivoTrue(1L))
+            .thenReturn(Optional.of(producto));
+        when(ventaRepository.save(any(Venta.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         VentaResponse response = ventaService.crear(ventaRequest);
@@ -112,6 +123,13 @@ public class VentaServiceTest {
         assertEquals(600L, detalle.precioUnitario());
         assertEquals(3000L, detalle.subtotal());
         verify(ventaRepository).save(any(Venta.class));
+        verify(movimientoStockService).registrar(
+            eq(producto),
+            any(Venta.class),
+            eq(TipoMovimientoStock.VENTA),
+            eq(-5L),
+            eq("Salida de stock por venta")
+        );
     }
 
     @Test
@@ -149,6 +167,15 @@ public class VentaServiceTest {
         // Assert
         assertEquals("ANULADA", response.estadoVenta());
         assertEquals(60L, producto.getStock()); // Devuelve stock: 50 + 10 = 60
+
+        verify(movimientoStockService).registrar(
+            eq(producto),
+            eq(venta),
+            eq(TipoMovimientoStock.ANULACION),
+            eq(10l),
+            eq("Entrada de stock por anulación de venta")
+        );
+
     }
 
     @Test

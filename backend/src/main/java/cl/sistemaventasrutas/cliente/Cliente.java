@@ -6,9 +6,18 @@ import jakarta.persistence.*;
 @Entity
 @Table(
     name = "clientes",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_cliente_telefono",
+            columnNames = "telefono"
+        ),
+        @UniqueConstraint(
+            name = "uk_cliente_direccion",
+            columnNames = "direccion"
+        )
+    },
     indexes = {
-        @Index(name = "idx_cliente_ruta", columnList = "ruta_id"),
-        @Index(name = "idx_cliente_activo", columnList = "activo")
+        @Index(name = "idx_clientes_ruta", columnList = "ruta_id")
     }
 )
 
@@ -21,10 +30,10 @@ public class Cliente {
     @Column(nullable = false, length = 160)
     private String nombre;
 
-    @Column(nullable = false, unique = true,length = 30)
+    @Column(nullable = false, length = 30)
     private String telefono;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, length = 255)
     private String direccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
